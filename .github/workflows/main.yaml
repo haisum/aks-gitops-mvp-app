@@ -1,0 +1,28 @@
+name: 'Publish Docker Image'
+on: push
+jobs:
+  publish:
+    name: 'Publish Image'
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: 'Login'
+        uses: actions/checkout@master
+      - name: Docker Registry
+        env:
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        run: 
+          docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+      - name: Building Docker Image
+        env:
+          DOCKER_USERNAME : ${{ secrets.DOCKER_USERNAME }}
+          CONTAINER_NAME: helloworld
+        run:
+          docker build -t $DOCKER_USERNAME/$CONTAINER_NAME:latest .
+      - name: Push Docker Container to Registry
+        env:
+          DOCKER_USERNAME : ${{ secrets.DOCKER_USERNAME }}
+          CONTAINER_NAME: helloworld
+        run: 
+          docker push $DOCKER_USERNAME/$CONTAINER_NAME:latest
