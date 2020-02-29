@@ -33,4 +33,4 @@ jobs:
           DOCKER_USERNAME : ${{ secrets.DOCKER_USERNAME }}
           CONTAINER_NAME: helloworld
         run: 
-          docker push $DOCKER_USERNAME/$CONTAINER_NAME:${{steps.extract_branch.outputs.extract_branch}}${{steps.date.outputs.date}}${{ GITHUB_SHA::5 }}
+          docker push $DOCKER_USERNAME/$CONTAINER_NAME:${{steps.extract_branch.outputs.extract_branch}}${{steps.date.outputs.date}}${GITHUB_SHA::5}
