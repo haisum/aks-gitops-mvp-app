@@ -6,21 +6,24 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - name: 'Login'
+      - name: 'Checkout'
         uses: actions/checkout@master
       - name: Docker Registry
+        runs-on: ubuntu-latest
         env:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         run: 
           docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
       - name: Building Docker Image
+        runs-on: ubuntu-latest
         env:
           DOCKER_USERNAME : ${{ secrets.DOCKER_USERNAME }}
           CONTAINER_NAME: helloworld
         run:
           docker build -t $DOCKER_USERNAME/$CONTAINER_NAME:latest .
       - name: Push Docker Container to Registry
+        runs-on: ubuntu-latest
         env:
           DOCKER_USERNAME : ${{ secrets.DOCKER_USERNAME }}
           CONTAINER_NAME: helloworld
