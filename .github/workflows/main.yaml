@@ -27,7 +27,7 @@ jobs:
           DOCKER_USERNAME : ${{ secrets.DOCKER_USERNAME }}
           CONTAINER_NAME: helloworld
         run:
-          docker build -t $DOCKER_USERNAME/$CONTAINER_NAME:${{steps.extract_branch.outputs.branch}}-${{steps.date.outputs.date}}-${GITHUB_SHA::5}
+          docker build -t $DOCKER_USERNAME/$CONTAINER_NAME:${{steps.extract_branch.outputs.branch}}-${{steps.date.outputs.date}}-${GITHUB_SHA::5} .
       - name: Push Docker Container to Registry
         env:
           DOCKER_USERNAME : ${{ secrets.DOCKER_USERNAME }}
