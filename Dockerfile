@@ -1,14 +1,6 @@
-FROM ubuntu:latest
+FROM python:3.7.6-stretch
 
 MAINTAINER Haisum Mussawir
-
-RUN set -ex \
-	&& apt-get update \
-	&& apt-get install -y \
- 			python-pip \
- 			python-dev \
- 			build-essential \
- 	&& pip install --upgrade pip
 
 ENV APPPATH /opt/myflaskapp
 COPY . $APPPATH
