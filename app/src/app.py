@@ -7,7 +7,7 @@ def hello_world():
 
 
 @app.route('/version')
-def hello_world():
+def version():
     return '1.0'
 
 @app.route('/api')
