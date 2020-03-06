@@ -16,7 +16,7 @@ def version():
 @app.route('/log')
 def log():
     paragraph = lorem.paragraph()
-    print(paragraph)
+    print(paragraph, flush = True)
     return paragraph
 
 @app.route('/api')
@@ -24,4 +24,4 @@ def rest_hello_world():
     return '{"id":1,"message":"Flask: Hello World from Docker"}'
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=9898)
+    app.run(host='0.0.0.0', port=9898)
