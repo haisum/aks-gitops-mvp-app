@@ -1,4 +1,6 @@
 from flask import Flask
+import lorem
+
 app = Flask(__name__)
 
 @app.route('/')
@@ -8,7 +10,14 @@ def hello_world():
 
 @app.route('/version')
 def version():
-    return '1.2'
+    return '1.3'
+
+
+@app.route('/log')
+def log():
+	paragraph = lorem.paragraph()
+	print(paragraph)
+    return paragraph
 
 @app.route('/api')
 def rest_hello_world():
