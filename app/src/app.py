@@ -1,7 +1,13 @@
 from flask import Flask
 import lorem
+import logging
+
 
 app = Flask(__name__)
+
+# Disable accessive logging
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 
 @app.route('/')
 def hello_world():
