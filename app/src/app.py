@@ -15,8 +15,8 @@ def version():
 
 @app.route('/log')
 def log():
-	paragraph = lorem.paragraph()
-	print(paragraph)
+    paragraph = lorem.paragraph()
+    print(paragraph)
     return paragraph
 
 @app.route('/api')
