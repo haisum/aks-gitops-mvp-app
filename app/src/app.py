@@ -11,12 +11,12 @@ log.setLevel(logging.ERROR)
 
 @app.route('/')
 def hello_world():
-    return 'Flask: Hello World from Docker'
+    return 'Flask: Hello World from Canary Deployment'
 
 
 @app.route('/version')
 def version():
-    return '1.3'
+    return 'V1canary'
 
 
 @app.route('/log')
@@ -27,7 +27,7 @@ def log():
 
 @app.route('/api')
 def rest_hello_world():
-    return '{"id":1,"message":"Flask: Hello World from Docker"}'
+    return '{"id":1,"message":"Flask: Hello World from Canary Deployment"}'
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=9898)
