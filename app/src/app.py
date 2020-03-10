@@ -10,11 +10,11 @@ app = Flask(__name__)
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
-@app.route('/')
+@app.route('/error/500')
 def error500():
 	abort(500, description="internal server error")
 
-# @app.route('/')
+@app.route('/')
 def hello_world():
     return 'Flask: Hello World from Canary Deployment v10'
 
