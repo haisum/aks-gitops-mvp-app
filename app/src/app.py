@@ -11,12 +11,12 @@ log.setLevel(logging.ERROR)
 
 @app.route('/')
 def hello_world():
-    return 'Flask: Hello World from Canary Deployment v4'
+    return 'Flask: Hello World from Canary Deployment v5'
 
 
 @app.route('/version')
 def version():
-    return 'V4canary'
+    return 'V5canary'
 
 
 @app.route('/log')
