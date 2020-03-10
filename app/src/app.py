@@ -1,4 +1,5 @@
 from flask import Flask
+from flask import abort
 import lorem
 import logging
 
@@ -10,13 +11,17 @@ log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
 @app.route('/')
+def error500():
+	abort(500, description="internal server error")
+
+# @app.route('/')
 def hello_world():
-    return 'Flask: Hello World from Canary Deployment v9'
+    return 'Flask: Hello World from Canary Deployment v10'
 
 
 @app.route('/version')
 def version():
-    return 'V9'
+    return 'V10'
 
 
 @app.route('/log')
