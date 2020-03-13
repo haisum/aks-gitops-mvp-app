@@ -1,8 +1,8 @@
 name: 'Publish Docker Image'
 on: 
   push:
-    branches: 
-    - '!master'
+    branches-ignore: 
+    - 'master'
   status:
   deployment: 
   deployment_status:
