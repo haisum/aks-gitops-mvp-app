@@ -48,10 +48,11 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
+            console.log("Context %j", context)
             await github.repos.createStatus({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              sha: context.repo.head,
+              sha: context.head.sha,
               context: 'manual',
               state: 'pending',
               description: 'Test status pending'
@@ -64,7 +65,7 @@ jobs:
             await github.repos.createStatus({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              sha: context.repo.head,
+              sha: context.head.sha,
               context: 'manual',
               state: 'success',
               description: 'Test status success'
