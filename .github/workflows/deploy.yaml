@@ -9,7 +9,7 @@ jobs:
   deploy:
     name: 'Deploy blue environment'
     runs-on: ubuntu-latest
-    if: github.event_name == 'deployment_status' && github.event.deployment.payload.type=='blue'
+    if: github.event_name == 'deployment_status' # && github.event.deployment.payload.type=='blue'
 
     steps:
       - uses: actions/checkout@v1
@@ -25,6 +25,7 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
+            console.log("%j", context)
             await github.repos.createDeploymentStatus({
               owner: context.repo.owner,
               repo: context.repo.repo,

@@ -39,11 +39,10 @@ jobs:
             environment: 'production',
             payload: '{ "app": "helloworld", "type": "blue" }'
           });
-          console.log('%j', deployment)
           console.log("::set-output name=deployment_id::%s", deployment.data.id)
 
     - name: 'Update deployment status'
-      if: steps.check.outputs.result == 'success'
+      if: steps.check.outputs.status == 'success'
       uses: actions/github-script@0.8.0
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
