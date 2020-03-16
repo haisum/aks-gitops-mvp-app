@@ -1,11 +1,11 @@
-name: 'Publish Docker Image'
+name: 'Build application'
 on: 
-  push:
-    branches-ignore: 
-    - 'master'
   status:
-  deployment: 
-  deployment_status:
+  check_run:
+  push:
+    branches:
+      - '*'
+      - '!master'
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -14,69 +14,88 @@ jobs:
   publish:
     name: 'Publish Image'
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: 'Checkout'
+        if: github.event_name == 'push'
         uses: actions/checkout@master
-      - name: Docker Registry
+
+      - name: Build and push image
+        if: github.event_name == 'push'
         env:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-        run: 
+          CONTAINER_NAME: helloworld
+        run: |
+          export date=`date +'%Y%m%d%H%M%S'`
+          export branch=`echo ${GITHUB_REF#refs/heads/}`
+          export tag="$DOCKER_USERNAME/$CONTAINER_NAME:${branch}-${date}.${{github.run_id}}.${GITHUB_SHA::7}"
+
           docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-      - name: Get Current Date
-        id: date
-        run: echo "::set-output name=date::$(date +'%Y%m%d%H%M%S')"
-      - name: Extract Branch Name
-        shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-        id: extract_branch
-      - name: Building Docker Image
-        env:
-          DOCKER_USERNAME : ${{ secrets.DOCKER_USERNAME }}
-          CONTAINER_NAME: helloworld
-        run:
-          docker build -t $DOCKER_USERNAME/$CONTAINER_NAME:${{steps.extract_branch.outputs.branch}}-${{steps.date.outputs.date}}.${{github.run_id}}.${GITHUB_SHA::7} .
-      - name: Push Docker Container to Registry
-        env:
-          DOCKER_USERNAME : ${{ secrets.DOCKER_USERNAME }}
-          CONTAINER_NAME: helloworld
-        run: 
-          docker push $DOCKER_USERNAME/$CONTAINER_NAME:${{steps.extract_branch.outputs.branch}}-${{steps.date.outputs.date}}.${{github.run_id}}.${GITHUB_SHA::7}
+          docker build -t  $tag .
+          docker push $tag
 
-      - uses: actions/github-script@0.8.0
+      - name: 'Check statuses'
+        id: check
+        uses: actions/github-script@0.8.0
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            console.log("Context %j", context)
-            await github.repos.createStatus({
+            const status = await github.repos.getCombinedStatusForRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              sha: context.sha,
-              context: 'manual',
-              state: 'pending',
-              description: 'Test status pending'
+              ref: context.payload.sha,
             });
+            console.log("::set-output name=status::%s",status.data.state)
       
-      - uses: actions/github-script@0.8.0
+      - name: 'Create deployment'
+        if: steps.check.outputs.status == 'success'
+        id: deployment
+        uses: actions/github-script@0.8.0
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            await github.repos.createStatus({
+            const deployment = await github.repos.createDeployment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              sha: context.sha,
-              context: 'manual',
-              state: 'success',
-              description: 'Test status success'
+              ref: context.payload.sha,
+              auto_merge: false,
+              environment: 'production',
+              payload: '{ "app": "helloworld", "type": "blue" }'
+            });
+            console.log("::set-output name=deployment_id::%s", deployment.data.id)
+
+      - name: 'Update deployment status'
+        if: steps.check.outputs.status == 'success'
+        uses: actions/github-script@0.8.0
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const deployment = await github.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: ${{ steps.deployment.outputs.deployment_id }},
+              state: 'pending',
             });
 
-      - name: hub example
+      - name: 'Deploy to blue environment'
+        if: github.event.deployment_status.state == 'pending'
         shell: bash
         run: |
-          curl -fsSL https://github.com/github/hub/raw/master/script/get | bash -s 2.14.1
-          bin/hub ci-status -v || :
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-
+          echo 'Deploying blue'
+        
+      - name: 'Update deployment status'
+        if: github.event.deployment_status.state == 'pending'
+        uses: actions/github-script@0.8.0
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            console.log("%j", context);
+            await github.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: ${{github.event.deployment.id}},
+              state: 'in_progress',
+              mediaType: { previews: ["flash-preview"] },
+              description: 'Blue environment deployed'
+            });
