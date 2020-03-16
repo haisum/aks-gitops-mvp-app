@@ -1,4 +1,4 @@
-name: 'Deploy branch'
+name: 'Deploy blue environment'
 on: 
   deployment_status:
 
