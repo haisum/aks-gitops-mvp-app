@@ -1,12 +1,13 @@
 name: 'Check statuses'
 on: 
   status:
+  check_run:
 
 jobs:
   check-status:
     name: 'Check statuses'
     runs-on: ubuntu-latest
-    if: github.event_name == 'status'
+    if: github.event_name == 'status' || github.event_name == 'check_run'
 
     steps:
     - uses: actions/checkout@v1
