@@ -23,6 +23,8 @@ jobs:
             ref: context.sha,
           });
           console.log("##[set-output name=status;]%s",status.data.state)
+          console.log("::set-output name=status::%s",status.data.state)
+          console.log("%j", status.data);
     
     - name: 'Create deployment'
       if: steps.check.outputs.status == 'success'
