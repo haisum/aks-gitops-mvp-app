@@ -44,7 +44,7 @@ jobs:
             const status = await github.repos.getCombinedStatusForRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: context.payload.sha,
+              ref: context.head || context.payload.sha,
             });
             console.log("::set-output name=status::%s",status.data.state)
       
@@ -58,7 +58,7 @@ jobs:
             const deployment = await github.repos.createDeployment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: context.payload.sha,
+              ref: context.head || context.payload.sha,
               auto_merge: false,
               environment: 'production',
               payload: '{ "app": "helloworld", "type": "blue" }'
