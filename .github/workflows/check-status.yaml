@@ -21,7 +21,8 @@ jobs:
             repo: context.repo.repo,
             ref: context.sha,
           });
-          return status.data.state;
+          console.log("%j", status)
+          return status.state;
     
     - name: 'Create deployment'
       if: steps.check.outputs.status == 'success'
@@ -37,7 +38,7 @@ jobs:
             environment: 'production',
             payload: '{ "app": "helloworld", "type": "blue" }'
           });
-          return deployment.data.id;
+          return deployment.id;
 
     - name: 'Update deployment status'
       if: steps.check.outputs.status == 'success'
