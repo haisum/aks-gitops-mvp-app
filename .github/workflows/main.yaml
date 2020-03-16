@@ -1,12 +1,9 @@
 name: 'Publish Docker Image'
 on: 
   push:
-    branches-ignore: 
-    - 'master'
-  status:
-  deployment: 
-  deployment_status:
-
+    branches:
+      - '*'
+      - '!master'
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -14,7 +11,8 @@ jobs:
   publish:
     name: 'Publish Image'
     runs-on: ubuntu-latest
-    
+    if: github.event_name == 'push'
+
     steps:
       - name: 'Checkout'
         uses: actions/checkout@master
@@ -43,40 +41,3 @@ jobs:
           CONTAINER_NAME: helloworld
         run: 
           docker push $DOCKER_USERNAME/$CONTAINER_NAME:${{steps.extract_branch.outputs.branch}}-${{steps.date.outputs.date}}.${{github.run_id}}.${GITHUB_SHA::7}
-
-      - uses: actions/github-script@0.8.0
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            console.log("Context %j", context)
-            await github.repos.createStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              sha: context.sha,
-              context: 'manual',
-              state: 'pending',
-              description: 'Test status pending'
-            });
-      
-      - uses: actions/github-script@0.8.0
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            await github.repos.createStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              sha: context.sha,
-              context: 'manual',
-              state: 'success',
-              description: 'Test status success'
-            });
-
-      - name: hub example
-        shell: bash
-        run: |
-          curl -fsSL https://github.com/github/hub/raw/master/script/get | bash -s 2.14.1
-          bin/hub ci-status -v || :
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-

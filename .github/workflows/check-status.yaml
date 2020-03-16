@@ -1,0 +1,54 @@
+
+name: 'Check statuses'
+on: 
+  status:
+
+jobs:
+  check-status:
+    name: 'Check statuses'
+    runs-on: ubuntu-latest
+    if: github.event_name == 'status'
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: 'Check statuses'
+      id: check
+      uses: actions/github-script@0.8.0
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const status = await github.repos.getCombinedStatusForRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: context.sha,
+            });
+            return status.data.state;
+    
+    - name: 'Create deployment'
+      if: steps.check.outputs.status == 'success'
+      id: deployment
+      uses: actions/github-script@0.8.0
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const deployment = await github.repos.createDeployment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: context.sha,
+              environment: 'production',
+              payload: '{ "app": "helloworld", "type": "blue" }'
+            });
+            return deployment.data.id;
+
+    - name: 'Update deployment status'
+      if: steps.check.outputs.status == 'success'
+      uses: actions/github-script@0.8.0
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const deployment = await github.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: ${{ steps.deployment.outputs.result }},
+              state: 'pending',
+            });
