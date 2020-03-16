@@ -35,6 +35,7 @@ jobs:
             owner: context.repo.owner,
             repo: context.repo.repo,
             ref: context.payload.sha,
+            auto_merge: false,
             environment: 'production',
             payload: '{ "app": "helloworld", "type": "blue" }'
           });
