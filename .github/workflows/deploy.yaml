@@ -1,4 +1,4 @@
-name: 'Deploy latest build'
+name: 'Canary rollout'
 on: 
   deployment_status:
 
