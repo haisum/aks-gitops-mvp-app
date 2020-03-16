@@ -8,7 +8,7 @@ def hello_world():
 
 @app.route('/version')
 def hello_world():
-    return '3.0'
+    return '4.0'
 
 @app.route('/api')
 def rest_hello_world():
