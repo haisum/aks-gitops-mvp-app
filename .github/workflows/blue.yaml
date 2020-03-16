@@ -68,7 +68,7 @@ jobs:
             await github.repos.createDeploymentStatus({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              deployment_id: ${{github.event.deployment.id}},
+              deployment_id: ${{steps.deployment.outputs.deployment_id}},
               state: 'in_progress',
               mediaType: { previews: ["flash-preview"] },
               description: 'Blue environment deployed'
