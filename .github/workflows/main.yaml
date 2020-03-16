@@ -1,7 +1,5 @@
 name: 'Build application'
 on: 
-  status:
-  check_run:
   push:
     branches:
       - '*'

@@ -70,6 +70,6 @@ jobs:
               repo: context.repo.repo,
               deployment_id: ${{steps.deployment.outputs.deployment_id}},
               state: 'in_progress',
-              mediaType: { previews: ["flash-preview"] },
+              mediaType: '{ "previews": ["flash-preview"] }',
               description: 'Blue environment deployed'
             });
