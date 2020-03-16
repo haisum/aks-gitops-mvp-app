@@ -1,4 +1,4 @@
-name: 'Deploy blue environment'
+name: 'Deploy latest build'
 on: 
   deployment_status:
 
@@ -12,28 +12,6 @@ jobs:
     if: github.event_name == 'deployment_status' # && github.event.deployment.payload.type=='blue'
 
     steps:
-      - uses: actions/checkout@v1
-      - name: 'Deploy to blue environment'
-        if: github.event.deployment_status.state == 'pending'
-        shell: bash
-        run: |
-          echo 'Deploying blue'
-      
-      - name: 'Update deployment status'
-        if: github.event.deployment_status.state == 'pending'
-        uses: actions/github-script@0.8.0
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            console.log("%j", context)
-            await github.repos.createDeploymentStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              deployment_id: ${{github.event.deployment.id}}
-              state: 'in_progress',
-              description: 'Blue environment deployed'
-            });
-              
       - name: 'Deploy to canary environment'
         if: github.event.deployment_status.state == 'queued'
         shell: bash
@@ -46,18 +24,10 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            const deployment = await github.repos.createDeploymentStatus({
+            github.repos.createDeploymentStatus({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              deployment_id: ${{github.event.deployment.id}}
+              deployment_id: ${{github.event.deployment.id}},
               state: 'success',
               description: 'Blue environment deployed'
             });
-
-  # placeholder2:
-  #   name: 'Placeholder Job'
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Placeholder
-  #       shell: bash
-  #       run: echo "Placeholder"

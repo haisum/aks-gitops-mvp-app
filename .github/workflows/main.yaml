@@ -1,9 +1,12 @@
-name: 'Publish Docker Image'
+name: 'Build application'
 on: 
+  status:
+  check_run:
   push:
     branches:
       - '*'
       - '!master'
+
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -41,3 +44,76 @@ jobs:
           CONTAINER_NAME: helloworld
         run: 
           docker push $DOCKER_USERNAME/$CONTAINER_NAME:${{steps.extract_branch.outputs.branch}}-${{steps.date.outputs.date}}.${{github.run_id}}.${GITHUB_SHA::7}
+
+
+  check-status:
+    name: 'Check statuses'
+    runs-on: ubuntu-latest
+    needs: publish
+    if: github.event_name != 'status' || github.event_name == 'check_run'
+
+    steps:
+    - name: 'Check statuses'
+      id: check
+      uses: actions/github-script@0.8.0
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          const status = await github.repos.getCombinedStatusForRef({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            ref: context.payload.sha,
+          });
+          console.log("::set-output name=status::%s",status.data.state)
+    
+    - name: 'Create deployment'
+      if: steps.check.outputs.status == 'success'
+      id: deployment
+      uses: actions/github-script@0.8.0
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          const deployment = await github.repos.createDeployment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            ref: context.payload.sha,
+            auto_merge: false,
+            environment: 'production',
+            payload: '{ "app": "helloworld", "type": "blue" }'
+          });
+          console.log("::set-output name=deployment_id::%s", deployment.data.id)
+
+    - name: 'Update deployment status'
+      if: steps.check.outputs.status == 'success'
+      uses: actions/github-script@0.8.0
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          const deployment = await github.repos.createDeploymentStatus({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            deployment_id: ${{ steps.deployment.outputs.deployment_id }},
+            state: 'pending',
+          });
+
+    - name: 'Deploy to blue environment'
+      if: github.event.deployment_status.state == 'pending'
+      shell: bash
+      run: |
+        echo 'Deploying blue'
+      
+    - name: 'Update deployment status'
+      if: github.event.deployment_status.state == 'pending'
+      uses: actions/github-script@0.8.0
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          console.log("%j", context);
+          await github.repos.createDeploymentStatus({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            deployment_id: ${{github.event.deployment.id}},
+            state: 'in_progress',
+            mediaType: { previews: ["flash-preview"] },
+            description: 'Blue environment deployed'
+          });
