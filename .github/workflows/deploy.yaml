@@ -52,7 +52,6 @@ jobs:
               state: 'success',
               description: 'Blue environment deployed'
             });
-            return deployment.data.id;
 
   # placeholder2:
   #   name: 'Placeholder Job'
