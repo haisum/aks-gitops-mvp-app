@@ -1,0 +1,33 @@
+name: 'Canary rollout'
+on: 
+  deployment_status:
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  deploy:
+    name: 'Deploy blue environment'
+    runs-on: ubuntu-latest
+    if: github.event_name == 'deployment_status' # && github.event.deployment.payload.type=='blue'
+
+    steps:
+      - name: 'Deploy to canary environment'
+        if: github.event.deployment_status.state == 'queued'
+        shell: bash
+        run: |
+          echo 'Deploying canary'
+      
+      - name: 'Update deployment status'
+        if: github.event.deployment_status.state == 'queued'
+        uses: actions/github-script@0.8.0
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: ${{github.event.deployment.id}},
+              state: 'success',
+              description: 'Blue environment deployed'
+            });
