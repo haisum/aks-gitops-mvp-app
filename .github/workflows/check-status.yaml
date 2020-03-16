@@ -20,11 +20,9 @@ jobs:
           const status = await github.repos.getCombinedStatusForRef({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            ref: context.sha,
+            ref: context.payload.sha,
           });
-          console.log("##[set-output name=status;]%s",status.data.state)
           console.log("::set-output name=status::%s",status.data.state)
-          console.log("%j", context);
     
     - name: 'Create deployment'
       if: steps.check.outputs.status == 'success'
@@ -36,12 +34,12 @@ jobs:
           const deployment = await github.repos.createDeployment({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            ref: context.sha,
+            ref: context.payload.sha,
             environment: 'production',
             payload: '{ "app": "helloworld", "type": "blue" }'
           });
           console.log('%j', deployment)
-          console.log("##[set-output name=deployment_id;]%s",deployment.data.id)
+          console.log("::set-output name=deployment_id::%s", deployment.data.id)
 
     - name: 'Update deployment status'
       if: steps.check.outputs.result == 'success'
