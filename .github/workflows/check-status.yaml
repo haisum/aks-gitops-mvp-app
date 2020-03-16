@@ -6,7 +6,6 @@ jobs:
   check-status:
     name: 'Check statuses'
     runs-on: ubuntu-latest
-    needs: publish
     if: github.event_name == 'status'
 
     steps:
@@ -54,10 +53,10 @@ jobs:
             state: 'pending',
           });
 
-  placeholder1:
-    name: 'Placeholder Job'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Placeholder
-        shell: bash
-        run: echo "Placeholder"
+  # placeholder1:
+  #   name: 'Placeholder Job'
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Placeholder
+  #       shell: bash
+  #       run: echo "Placeholder"
