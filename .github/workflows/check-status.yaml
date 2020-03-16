@@ -53,3 +53,11 @@ jobs:
             deployment_id: ${{ steps.deployment.outputs.result }},
             state: 'pending',
           });
+
+  placeholder1:
+    name: 'Placeholder Job'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Placeholder
+        shell: bash
+        run: echo "Placeholder"

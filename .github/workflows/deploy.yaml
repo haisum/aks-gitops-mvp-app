@@ -54,3 +54,11 @@ jobs:
               description: 'Blue environment deployed'
             });
             return deployment.data.id;
+
+  placeholder2:
+    name: 'Placeholder Job'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Placeholder
+        shell: bash
+        run: echo "Placeholder"
