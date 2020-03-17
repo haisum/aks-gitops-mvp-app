@@ -1,5 +1,5 @@
 name: 'Build application'
-on: 
+on:
   push:
     branches:
       - '*'
@@ -36,11 +36,12 @@ jobs:
         env:
           DOCKER_USERNAME : ${{ secrets.DOCKER_USERNAME }}
           CONTAINER_NAME: helloworld
-        run:
-          docker build -t $DOCKER_USERNAME/$CONTAINER_NAME:${{steps.extract_branch.outputs.branch}}-${{steps.date.outputs.date}}.${{github.run_id}}.${GITHUB_SHA::7} .
+        run: |
+          docker build -t $DOCKER_USERNAME/$CONTAINER_NAME:${{steps.extract_branch.outputs.branch}}-${{steps.date.outputs.date}}.${{github.run_id}}.${GITHUB_SHA::7} -t $DOCKER_USERNAME/$CONTAINER_NAME:${{steps.extract_branch.outputs.branch}}-latest .
       - name: Push Docker Container to Registry
         env:
           DOCKER_USERNAME : ${{ secrets.DOCKER_USERNAME }}
           CONTAINER_NAME: helloworld
-        run:
+        run: |
            docker push $DOCKER_USERNAME/$CONTAINER_NAME:${{steps.extract_branch.outputs.branch}}-${{steps.date.outputs.date}}.${{github.run_id}}.${GITHUB_SHA::7}
+           docker push $DOCKER_USERNAME/$CONTAINER_NAME:${{steps.extract_branch.outputs.branch}}-latest
