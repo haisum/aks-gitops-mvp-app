@@ -10,15 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Extract Branch Name
+      - name: Log event
         shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-        id: extract_branch
-      - name: 'Checkout'
-        if: github.event_name == 'push'
-        uses: actions/checkout@master
-        with:
-          ref: ${{ github.ref }}
+        run: echo ${{ github.event }} | jq
       - name: Docker Registry login
         env:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
@@ -30,7 +24,7 @@ jobs:
           DOCKER_USERNAME : ${{ secrets.DOCKER_USERNAME }}
           CONTAINER_NAME: helloworld
         run: |
-          docker run -it -p 9898:9898 $DOCKER_USERNAME/$CONTAINER_NAME:${{steps.extract_branch.outputs.branch}}-latest
+          docker run -p 9898:9898 $DOCKER_USERNAME/$CONTAINER_NAME:${{ github.event.pull_request.head.ref }}-latest
       - name: Run curl to test
         run: |
           sleep 2s;
