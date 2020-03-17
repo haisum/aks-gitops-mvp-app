@@ -18,7 +18,7 @@ def error500():
 @app.route('/')
 def hello_world():
 	# Add latency
-	time.sleep(1)
+	time.sleep(2)
     return 'Flask: Hello World from Canary Deployment v19'
 
 
