@@ -16,12 +16,12 @@ def error500():
 
 @app.route('/')
 def hello_world():
-    return 'Flask: Hello World from Canary Deployment v17'
+    return 'Flask: Hello World from Canary Deployment v18'
 
 
 @app.route('/version')
 def version():
-    return 'V17'
+    return 'V18'
 
 
 @app.route('/log')
