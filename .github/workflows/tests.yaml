@@ -10,9 +10,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Log event
-        shell: bash
-        run: echo ${{ github.event }} | jq
       - name: Docker Registry login
         env:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
