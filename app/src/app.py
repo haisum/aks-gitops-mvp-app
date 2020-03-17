@@ -2,6 +2,7 @@ from flask import Flask
 from flask import abort
 import lorem
 import logging
+import time
 
 
 app = Flask(__name__)
@@ -16,12 +17,14 @@ def error500():
 
 @app.route('/')
 def hello_world():
-    return 'Flask: Hello World from Canary Deployment v18'
+	# Add latency
+	time.sleep(1)
+    return 'Flask: Hello World from Canary Deployment v19'
 
 
 @app.route('/version')
 def version():
-    return 'V18'
+    return 'V19'
 
 
 @app.route('/log')
