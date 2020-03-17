@@ -14,21 +14,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Extract Branch Name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
       - name: 'Checkout'
         if: github.event_name == 'push'
         uses: actions/checkout@master
-
-      - name: Build and push image
-        if: github.event_name == 'push'
+        with:
+          ref: ${{ github.ref }}
+      - name: Docker Registry login
         env:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        run: 
+          docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+      - name: Get Current Date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y%m%d%H%M%S')"
+      - name: Building Docker Image
+        env:
+          DOCKER_USERNAME : ${{ secrets.DOCKER_USERNAME }}
           CONTAINER_NAME: helloworld
         run: |
-          export date=`date +'%Y%m%d%H%M%S'`
-          export branch=`echo ${GITHUB_REF#refs/heads/}`
-          export tag="$DOCKER_USERNAME/$CONTAINER_NAME:${branch}-${date}.${{github.run_id}}.${GITHUB_SHA::7}"
-
-          docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-          docker build -t  $tag .
-          docker push $tag
+           docker build -t $DOCKER_USERNAME/$CONTAINER_NAME:${{steps.extract_branch.outputs.branch}}-${{steps.date.outputs.date}}.${{github.run_id}}.${GITHUB_SHA::7} .
+        - name: Push Docker Container to Registry
+          env:
+            DOCKER_USERNAME : ${{ secrets.DOCKER_USERNAME }}
+            CONTAINER_NAME: helloworld
+          run: |
+            docker push $DOCKER_USERNAME/$CONTAINER_NAME:${{steps.extract_branch.outputs.branch}}-${{steps.date.outputs.date}}.${{github.run_id}}.${GITHUB_SHA::7}
