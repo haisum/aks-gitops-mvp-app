@@ -1,0 +1,28 @@
+name: 'Tests application'
+on: pull_request
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  test:
+    name: 'Test App'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Docker Registry login
+        env:
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        run: 
+          docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+      - name: Run container
+        env:
+          DOCKER_USERNAME : ${{ secrets.DOCKER_USERNAME }}
+          CONTAINER_NAME: helloworld
+        run: |
+          docker run -d -p 9898:9898 $DOCKER_USERNAME/$CONTAINER_NAME:${{ github.event.pull_request.head.ref }}-latest
+      - name: Run curl to test
+        run: |
+          sleep 2s;
+          curl -v -f http://localhost:9898;
