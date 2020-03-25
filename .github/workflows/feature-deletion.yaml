@@ -5,6 +5,14 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
+  debug:
+    name: dump event info
+    runs-on: ubuntu-latest
+    steps:
+      - name: dump event info
+        env:
+          EVENT: ${{ toJSON(event) }}
+        run: echo $EVENT;
   delete:
     name: 'Delete helm release'
     runs-on: ubuntu-latest
