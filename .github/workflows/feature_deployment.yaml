@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: dump event info
         env:
-          EVENT: ${{ toJSON(event) }}
+          EVENT: "${{ toJSON(event) }}"
         run: echo $EVENT;
   deploy:
     name: 'Deploy to review env'
