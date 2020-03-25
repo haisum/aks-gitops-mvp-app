@@ -61,7 +61,7 @@ jobs:
           OUTPUT_FILE: environments/staging/centralus/apps/${{github.ref}}/helloworld.yaml
           VAR_FILE: ${{ runner.temp }}/values.yaml
         run:
-          jinja2 "${TEMPLATE}" "${VAR_FILE}" --format=yaml > "${OUTPUT_FILE}";
+          /home/runner/.local/bin/./jinja2 "${TEMPLATE}" "${VAR_FILE}" --format=yaml > "${OUTPUT_FILE}";
           cat "${OUTPUT_FILE}";
       - name: Commit files
         run: |
