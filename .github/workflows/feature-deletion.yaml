@@ -1,0 +1,39 @@
+name: 'Delete from review env'
+on: delete
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  debug:
+    name: dump event info
+    runs-on: ubuntu-latest
+    steps:
+      - name: dump event info
+        env:
+          EVENT: "${{ toJSON(github.event) }}"
+        run: echo $EVENT;
+  delete:
+    name: 'Delete helm release'
+    runs-on: ubuntu-latest
+    if: ${{ github.event.ref_type }} == "branch" and ${{ startsWith(github.event.ref, 'feature-') }}
+
+    steps:
+      - name: checkout flux repo
+        uses: actions/checkout@v2
+        with:
+          repository: haisumb/aks-gitops-mvp-flux
+          token: ${{ secrets.GITHUB_PAT }}
+      - name: delete folder
+        run: |
+          rm -rf environments/staging/centralus/apps/${{ github.event.ref }};
+      - name: Commit files
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git commit -m "Delete release folder for ${{ github.event.ref }}" -a
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_PAT }}
+          repository: haisumb/aks-gitops-mvp-flux
