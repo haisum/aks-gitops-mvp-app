@@ -26,7 +26,8 @@ jobs:
           token: ${{ secrets.GITHUB_PAT }}
       - name: install jinja2 cli
         run: |
-           pip3 install jinja2-cli pyyaml
+           pip3 install -U pip setuptools;
+           pip3 install jinja2-cli pyyaml;
       - name: delete and re-create folder
         run: |
           rm -rf environments/staging/centralus/apps/${GITHUB_REF} || true;
