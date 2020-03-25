@@ -29,19 +29,15 @@ jobs:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         run: 
           docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-      - name: Get Current Date
-        id: date
-        run: echo "::set-output name=date::$(date +'%Y%m%d%H%M%S')"
       - name: Building Docker Image
         env:
           DOCKER_USERNAME : ${{ secrets.DOCKER_USERNAME }}
           CONTAINER_NAME: helloworld
         run: |
-          docker build -t $DOCKER_USERNAME/$CONTAINER_NAME:${{steps.extract_branch.outputs.branch}}-${{steps.date.outputs.date}}.${{github.run_id}}.${GITHUB_SHA::7} -t $DOCKER_USERNAME/$CONTAINER_NAME:${{steps.extract_branch.outputs.branch}}-latest .
+          docker build -t $DOCKER_USERNAME/$CONTAINER_NAME:${{steps.extract_branch.outputs.branch}}-${GITHUB_SHA} .
       - name: Push Docker Container to Registry
         env:
           DOCKER_USERNAME : ${{ secrets.DOCKER_USERNAME }}
           CONTAINER_NAME: helloworld
         run: |
-           docker push $DOCKER_USERNAME/$CONTAINER_NAME:${{steps.extract_branch.outputs.branch}}-${{steps.date.outputs.date}}.${{github.run_id}}.${GITHUB_SHA::7}
-           docker push $DOCKER_USERNAME/$CONTAINER_NAME:${{steps.extract_branch.outputs.branch}}-latest
+           docker push $DOCKER_USERNAME/$CONTAINER_NAME:${{steps.extract_branch.outputs.branch}}-${GITHUB_SHA}

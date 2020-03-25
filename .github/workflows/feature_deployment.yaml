@@ -1,0 +1,66 @@
+name: 'Deploy to review env'
+on: create
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  deploy:
+    name: 'Deploy to review env'
+    runs-on: ubuntu-latest
+    if: ${{ event.ref_type }} == "branch" and ${{ startsWith(event.ref, "feature-") }}
+
+    steps:
+      - name: checkout flux repo
+        uses: actions/checkout@v2
+        with:
+          repository: haisumb/aks-gitops-mvp-flux
+          token: ${{ secrets.GITHUB_PAT }}
+      - name: install jinja2 cli
+        run: |
+           pip3 install jinja2-cli pyyaml
+      - name: delete and re-create folder
+        run: |
+          rm -rf environments/staging/centralus/apps/${{ GITHUB_REF }} || true;
+          mkdir -p environments/staging/centralus/apps/${{ GITHUB_REF }};
+      - name: generate values file
+        run: |
+          cat <<EOF > ${{ runner.temp }}/values.yaml
+          automated: "true"
+          branch: ${{ GITHUB_REF }}
+          app:
+            name: helloworld
+            host: ${{ GITHUB_REF }}.helloworld.com
+          chart:
+            repo: git@github.com:haisumb/aks-gitops-mvp-flux
+            path: environments/staging/centralus/charts/generic
+            ref: master
+          image:
+            repo: haisumb/helloworld
+            tag: ${{ GITHUB_REF }}-${{ GITHUB_SHA }}
+          canary:
+            enabled: "false"
+            bluegreen:
+              enabled: "false"
+            promotion:
+              enabled: "false"
+              status: approve
+          EOF
+      - name: generate helm release file
+        env:
+          TEMPLATE: environments/staging/centralus/templates/helmrelease.j2
+          OUTPUT_FILE: environments/staging/centralus/apps/${{ GITHUB_REF }}/helloworld.yaml
+          VAR_FILE: ${{ runner.temp }}/values.yaml
+        run:
+          jinja2 "${TEMPLATE}" "${VAR_FILE}" --format=yaml > "${OUTPUT_FILE}";
+          cat "${OUTPUT_FILE}";
+      - name: Commit files
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git commit -m "Add release file for ${{ GITHUB_REF }}" -a
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_PAT }}
+          repository: haisumb/aks-gitops-mvp-flux
