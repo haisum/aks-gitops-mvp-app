@@ -12,7 +12,7 @@ jobs:
       - name: dump event info
         env:
           EVENT: "${{ toJSON(github.event) }}"
-        run: echo $EVENT;
+        run: echo "$EVENT" | jq;
   deploy:
     name: 'Deploy to review env'
     runs-on: ubuntu-latest
@@ -30,23 +30,23 @@ jobs:
            pip3 install jinja2-cli pyyaml;
       - name: delete and re-create folder
         run: |
-          rm -rf environments/staging/centralus/apps/${GITHUB_REF} || true;
-          mkdir -p environments/staging/centralus/apps/${GITHUB_REF};
+          rm -rf environments/staging/centralus/apps/${{ github.event.ref }} || true;
+          mkdir -p environments/staging/centralus/apps/${{ github.event.ref }};
       - name: generate values file
         run: |
           cat <<EOF > ${{ runner.temp }}/values.yaml
           automated: "true"
-          branch: ${GITHUB_REF}
+          branch: ${{ github.event.ref }}
           app:
             name: helloworld
-            host: ${GITHUB_REF}.helloworld.com
+            host: ${{ github.event.ref }}.helloworld.com
           chart:
             repo: git@github.com:haisumb/aks-gitops-mvp-flux
             path: environments/staging/centralus/charts/generic
             ref: master
           image:
             repo: haisumb/helloworld
-            tag: ${GITHUB_REF}-${GITHUB_SHA}
+            tag: ${{ github.event.ref }}-${GITHUB_SHA}
           canary:
             enabled: "false"
             bluegreen:
@@ -67,7 +67,7 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git commit -m "Add release file for ${GITHUB_REF}" -a
+          git commit -m "Add release file for ${{ github.event.ref }}" -a
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:

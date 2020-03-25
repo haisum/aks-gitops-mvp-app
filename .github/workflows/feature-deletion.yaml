@@ -26,12 +26,12 @@ jobs:
           token: ${{ secrets.GITHUB_PAT }}
       - name: delete folder
         run: |
-          rm -rf environments/staging/centralus/apps/${GITHUB_REF};
+          rm -rf environments/staging/centralus/apps/${{ github.event.ref }};
       - name: Commit files
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git commit -m "Delete release folder for ${GITHUB_REF}" -a
+          git commit -m "Delete release folder for ${{ github.event.ref }}" -a
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
