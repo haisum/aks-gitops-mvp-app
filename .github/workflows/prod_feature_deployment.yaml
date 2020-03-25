@@ -1,0 +1,19 @@
+name: 'Deploy feature to prod'
+on:
+  pull_request:
+    branches:
+      - master
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  debug:
+    name: dump event info
+    runs-on: ubuntu-latest
+    steps:
+      - name: dump event info
+        env:
+          EVENT: "${{ toJSON(github.event) }}"
+        run: echo ${EVENT} | jq '.';
+ 
