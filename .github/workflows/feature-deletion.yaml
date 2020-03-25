@@ -11,12 +11,12 @@ jobs:
     steps:
       - name: dump event info
         env:
-          EVENT: "${{ toJSON(event) }}"
+          EVENT: "${{ toJSON(github.event) }}"
         run: echo $EVENT;
   delete:
     name: 'Delete helm release'
     runs-on: ubuntu-latest
-    if: ${{ event.ref_type }} == "branch" and ${{ startsWith(event.ref, "feature-") }}
+    if: ${{ github.event.ref_type }} == "branch" and ${{ startsWith(github.event.ref, "feature-") }}
 
     steps:
       - name: checkout flux repo
