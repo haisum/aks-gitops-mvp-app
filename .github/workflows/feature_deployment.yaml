@@ -67,6 +67,7 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
+          git add environments/staging/centralus/apps/${{github.event.ref}}
           git commit -m "Add release file for ${{ github.event.ref }}" -a
       - name: Push changes
         uses: ad-m/github-push-action@master
