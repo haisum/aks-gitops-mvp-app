@@ -5,6 +5,14 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
+  debug:
+    name: dump event info
+    runs-on: ubuntu-latest
+    steps:
+      - name: dump event info
+        env:
+          EVENT: "${{ toJSON(github.event) }}"
+        run: echo ${EVENT} | jq '.';
   test:
     name: 'Test App'
     runs-on: ubuntu-latest
@@ -21,7 +29,7 @@ jobs:
           DOCKER_USERNAME : ${{ secrets.DOCKER_USERNAME }}
           CONTAINER_NAME: helloworld
         run: |
-          docker run -d -p 9898:9898 $DOCKER_USERNAME/$CONTAINER_NAME:${{ github.event.pull_request.head.ref }}-${GITHUB_SHA}
+          docker run -d -p 9898:9898 $DOCKER_USERNAME/$CONTAINER_NAME:${{ github.event.pull_request.head.ref }}-${{ github.event.pull_request.head.sha }}
       - name: Run curl to test
         run: |
           sleep 2s;
