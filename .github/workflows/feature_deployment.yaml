@@ -12,7 +12,7 @@ jobs:
       - name: dump event info
         env:
           EVENT: "${{ toJSON(github.event) }}"
-        run: echo "$EVENT";
+        run: echo '$EVENT' | jq '.';
   deploy:
     name: 'Deploy to review env'
     runs-on: ubuntu-latest
