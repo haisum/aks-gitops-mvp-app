@@ -12,7 +12,7 @@ jobs:
       - name: dump event info
         env:
           EVENT: "${{ toJSON(github.event) }}"
-        run: echo '$EVENT' | jq '.';
+        run: echo ${EVENT} | jq '.';
   delete:
     name: 'Delete helm release'
     runs-on: ubuntu-latest
