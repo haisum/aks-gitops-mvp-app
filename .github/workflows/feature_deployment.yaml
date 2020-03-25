@@ -29,23 +29,23 @@ jobs:
            pip3 install jinja2-cli pyyaml
       - name: delete and re-create folder
         run: |
-          rm -rf environments/staging/centralus/apps/${{ GITHUB_REF }} || true;
-          mkdir -p environments/staging/centralus/apps/${{ GITHUB_REF }};
+          rm -rf environments/staging/centralus/apps/${GITHUB_REF} || true;
+          mkdir -p environments/staging/centralus/apps/${GITHUB_REF};
       - name: generate values file
         run: |
           cat <<EOF > ${{ runner.temp }}/values.yaml
           automated: "true"
-          branch: ${{ GITHUB_REF }}
+          branch: ${GITHUB_REF}
           app:
             name: helloworld
-            host: ${{ GITHUB_REF }}.helloworld.com
+            host: ${GITHUB_REF}.helloworld.com
           chart:
             repo: git@github.com:haisumb/aks-gitops-mvp-flux
             path: environments/staging/centralus/charts/generic
             ref: master
           image:
             repo: haisumb/helloworld
-            tag: ${{ GITHUB_REF }}-${{ GITHUB_SHA }}
+            tag: ${GITHUB_REF}-${GITHUB_SHA}
           canary:
             enabled: "false"
             bluegreen:
@@ -57,7 +57,7 @@ jobs:
       - name: generate helm release file
         env:
           TEMPLATE: environments/staging/centralus/templates/helmrelease.j2
-          OUTPUT_FILE: environments/staging/centralus/apps/${{ GITHUB_REF }}/helloworld.yaml
+          OUTPUT_FILE: environments/staging/centralus/apps/${{github.ref}}/helloworld.yaml
           VAR_FILE: ${{ runner.temp }}/values.yaml
         run:
           jinja2 "${TEMPLATE}" "${VAR_FILE}" --format=yaml > "${OUTPUT_FILE}";
@@ -66,7 +66,7 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git commit -m "Add release file for ${{ GITHUB_REF }}" -a
+          git commit -m "Add release file for ${GITHUB_REF}" -a
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
