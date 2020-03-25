@@ -12,7 +12,7 @@ jobs:
       - name: dump event info
         env:
           EVENT: "${{ toJSON(github.event) }}"
-        run: echo "$EVENT" | jq;
+        run: echo "$EVENT";
   deploy:
     name: 'Deploy to review env'
     runs-on: ubuntu-latest
@@ -58,7 +58,7 @@ jobs:
       - name: generate helm release file
         env:
           TEMPLATE: environments/staging/centralus/templates/helmrelease.j2
-          OUTPUT_FILE: environments/staging/centralus/apps/${{github.ref}}/helloworld.yaml
+          OUTPUT_FILE: environments/staging/centralus/apps/${{github.event.ref}}/helloworld.yaml
           VAR_FILE: ${{ runner.temp }}/values.yaml
         run:
           /home/runner/.local/bin/./jinja2 "${TEMPLATE}" "${VAR_FILE}" --format=yaml > "${OUTPUT_FILE}";
