@@ -43,9 +43,9 @@ jobs:
             repo: haisumb/helloworld
             tag: ${{ github.event.pull_request.head.ref }}-${{ github.event.pull_request.head.sha }}
           canary:
-            enabled: "true"
+            enabled: "false"
             bluegreen:
-              enabled: "false"
+              enabled: "true"
             promotion:
               enabled: "false"
               status: approve
