@@ -36,6 +36,7 @@ jobs:
         run: |
           cat <<EOF > ${{ runner.temp }}/values.yaml
           automated: "true"
+          namespace: ${{ github.event.ref }}
           branch: ${{ github.event.ref }}
           app:
             name: helloworld

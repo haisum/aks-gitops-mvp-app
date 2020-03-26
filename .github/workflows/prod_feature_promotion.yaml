@@ -29,7 +29,8 @@ jobs:
       - name: generate values file
         run: |
           cat <<EOF > ${{ runner.temp }}/values.yaml
-          automated: "true"
+          automated: "false"
+          namespace: default
           branch: ${{ github.event.pull_request.head.ref }}
           app:
             name: helloworld

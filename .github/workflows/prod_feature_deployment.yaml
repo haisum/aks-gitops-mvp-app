@@ -30,6 +30,7 @@ jobs:
         run: |
           cat <<EOF > ${{ runner.temp }}/values.yaml
           automated: "true"
+          namespace: default
           branch: ${{ github.event.pull_request.head.ref }}
           app:
             name: helloworld-${{ github.event.pull_request.head.ref }}
