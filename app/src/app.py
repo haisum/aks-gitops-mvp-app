@@ -16,7 +16,7 @@ def error500():
 
 @app.route('/')
 def hello_world():
-    return 'Flask: Hello World from Canary Deployment v22'
+    return 'Flask: Hello World from feature Canary Deployment v22'
 
 
 def version():
