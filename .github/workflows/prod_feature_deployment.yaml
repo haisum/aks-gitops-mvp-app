@@ -32,7 +32,7 @@ jobs:
           automated: "true"
           branch: ${{ github.event.pull_request.head.ref }}
           app:
-            name: helloworld-{{ github.event.pull_request.head.ref }}
+            name: helloworld-${{ github.event.pull_request.head.ref }}
             host: ${{ github.event.pull_request.head.ref }}.prod.helloworld.com
           chart:
             repo: git@github.com:haisumb/aks-gitops-mvp-flux
@@ -52,7 +52,7 @@ jobs:
       - name: generate helm release file
         env:
           TEMPLATE: environments/staging/centralus/templates/helmrelease.j2
-          OUTPUT_FILE: environments/staging/centralus/apps/default/helloworld-{{ github.event.pull_request.head.ref }}.yaml
+          OUTPUT_FILE: environments/staging/centralus/apps/default/helloworld-${{ github.event.pull_request.head.ref }}.yaml
           VAR_FILE: ${{ runner.temp }}/values.yaml
         run:
           /home/runner/.local/bin/./jinja2 "${TEMPLATE}" "${VAR_FILE}" --format=yaml > "${OUTPUT_FILE}";
