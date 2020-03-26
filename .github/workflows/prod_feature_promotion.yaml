@@ -91,6 +91,3 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_PAT }}
           repository: haisumb/aks-gitops-mvp-flux
-
-
- 
