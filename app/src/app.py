@@ -35,9 +35,8 @@ def log():
 def rest_hello_world():
     return '{"id":1,"message":"Flask: Hello World from Canary Deployment"}'
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=9898)
-    metrics = PrometheusMetrics(app)
+app.run(host='0.0.0.0', port=9898)
+metrics = PrometheusMetrics(app)
 
-    # static information as metric
-    metrics.info('helloworld_info', 'Hello world info', version='25')
+# static information as metric
+metrics.info('helloworld_info', 'Hello world info', version='25')
