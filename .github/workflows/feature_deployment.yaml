@@ -49,7 +49,7 @@ jobs:
             repo: haisumb/helloworld
             tag: ${{ github.event.ref }}-${GITHUB_SHA}
           canary:
-            enabled: "false"
+            enabled: "true"
             bluegreen:
               enabled: "false"
             promotion:
