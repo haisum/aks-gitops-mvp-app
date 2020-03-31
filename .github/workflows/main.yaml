@@ -46,6 +46,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: publish
     steps:
+      - name: Extract Branch Name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
       - name: Docker Registry login
         env:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
@@ -60,7 +64,7 @@ jobs:
           DOCKER_USERNAME : ${{ secrets.DOCKER_USERNAME }}
           CONTAINER_NAME: helloworld
         run: |
-          docker run -d -p 9898:9898 $DOCKER_USERNAME/$CONTAINER_NAME:${{jobs.publish.steps.extract_branch.outputs.branch}}-${GITHUB_SHA}
+          docker run -d -p 9898:9898 $DOCKER_USERNAME/$CONTAINER_NAME:${{steps.extract_branch.outputs.branch}}-${GITHUB_SHA}
       - name: Run curl to test home
         run: |
           sleep 2s;
