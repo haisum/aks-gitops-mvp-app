@@ -1,5 +1,7 @@
 from flask import Flask
 from flask import abort
+from prometheus_flask_exporter import PrometheusMetrics
+
 import lorem
 import logging
 
@@ -16,11 +18,11 @@ def error500():
 
 @app.route('/')
 def hello_world():
-    return 'Flask: Hello World from feature test Canary Deployment v23'
+    return 'Flask: Hello World from feature test Canary Deployment v24'
 
 
 def version():
-    return 'V23'
+    return 'V24'
 
 
 @app.route('/log')
@@ -35,3 +37,7 @@ def rest_hello_world():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=9898)
+    metrics = PrometheusMetrics(app)
+
+    # static information as metric
+    metrics.info('helloworld_info', 'Hello world info', version='24')
