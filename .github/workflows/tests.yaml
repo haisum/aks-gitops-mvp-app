@@ -24,13 +24,20 @@ jobs:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         run: 
           docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+      - name: Sleep for 1 minute to let container build
+        run:
+          sleep 60;
       - name: Run container
         env:
           DOCKER_USERNAME : ${{ secrets.DOCKER_USERNAME }}
           CONTAINER_NAME: helloworld
         run: |
           docker run -d -p 9898:9898 $DOCKER_USERNAME/$CONTAINER_NAME:${{ github.event.pull_request.head.ref }}-${{ github.event.pull_request.head.sha }}
-      - name: Run curl to test
+      - name: Run curl to test home
         run: |
           sleep 2s;
           curl -v -f http://localhost:9898;
+      - name: Run curl to test metrics
+        run: |
+          sleep 2s;
+          curl -v -f http://localhost:9898/metrics;
