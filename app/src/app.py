@@ -18,11 +18,11 @@ def error500():
 
 @app.route('/')
 def hello_world():
-    return 'Flask: Hello World from feature test Canary Deployment v24'
+    return 'Flask: Hello World from feature test Canary Deployment v25'
 
 
 def version():
-    return 'V24'
+    return 'V25'
 
 
 @app.route('/log')
@@ -40,4 +40,4 @@ if __name__ == '__main__':
     metrics = PrometheusMetrics(app)
 
     # static information as metric
-    metrics.info('helloworld_info', 'Hello world info', version='24')
+    metrics.info('helloworld_info', 'Hello world info', version='25')
